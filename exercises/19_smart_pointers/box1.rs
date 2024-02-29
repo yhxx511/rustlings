@@ -18,11 +18,12 @@
 //
 // Execute `rustlings hint box1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+
 
 #[derive(PartialEq, Debug)]
 pub enum List {
-    Cons(i32, List),
+    // TODO 这里的box能否换成引用？因为Box是“持有”了一个堆上的对象，引用并没有持有对象
+    Cons(i32, Box<List>),
     Nil,
 }
 
@@ -35,11 +36,13 @@ fn main() {
 }
 
 pub fn create_empty_list() -> List {
-    todo!()
+    List::Nil
 }
 
 pub fn create_non_empty_list() -> List {
-    todo!()
+    let last = List::Nil;
+    let first = List::Cons(10, Box::new(last));
+    first
 }
 
 #[cfg(test)]

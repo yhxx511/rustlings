@@ -8,7 +8,7 @@
 // Execute `rustlings hint threads1` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+
 
 use std::thread;
 use std::time::{Duration, Instant};
@@ -27,6 +27,13 @@ fn main() {
     let mut results: Vec<u128> = vec![];
     for handle in handles {
         // TODO: a struct is returned from thread::spawn, can you use it?
+        let r = handle.join();
+        // join返回之后，handle就被销毁了。join函数把ownership拿走了。这是如何做到的？
+        // TODO 怎么告诉rust，这个函数的行为是这样的？  method(self) 而不是 method(&self)
+        match r {
+            Ok(actual_costs) => { results.push(actual_costs); }
+            Err(_) => {println!("thread failed");}
+        }
     }
 
     if results.len() != 10 {

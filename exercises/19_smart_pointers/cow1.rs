@@ -12,10 +12,12 @@
 //
 // Execute `rustlings hint cow1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+
 
 use std::borrow::Cow;
 
+// 给输入的数组取绝对值，如果需要，则会修改数组本身；但也可能不会修改。
+// 因此，使用Cow来解决“按需修改”时的所有权问题
 fn abs_all<'a, 'b>(input: &'a mut Cow<'b, [i32]>) -> &'a mut Cow<'b, [i32]> {
     for i in 0..input.len() {
         let v = input[i];
@@ -37,7 +39,8 @@ mod tests {
         let slice = [-1, 0, 1];
         let mut input = Cow::from(&slice[..]);
         match abs_all(&mut input) {
-            Cow::Owned(_) => Ok(()),
+            // TODO 这里assert_eq，需要类型匹配 Vec::<i32>::from  这种方式使用，而不是Vec<i32>::from()
+            Cow::Owned(v) => {assert_eq!(Vec::<i32>::from([1, 0, 1]), *v); Ok(())},
             _ => Err("Expected owned value"),
         }
     }
@@ -48,7 +51,18 @@ mod tests {
         let slice = [0, 1, 2];
         let mut input = Cow::from(&slice[..]);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Borrowed(_) => Ok(()),
+            _ => Err("Expected borrowed value"),
+        }
+    }
+
+    #[test]
+    fn reference_no_mutation2() -> Result<(), &'static str> {
+        let slice = vec![0, 1, 2];
+        let mut input = Cow::from(&slice);
+        match abs_all(&mut input) {
+            Cow::Borrowed(v) => {assert_eq!(Vec::<i32>::from([0, 1, 2]), *v); Ok(())},
+            _ => Err("Expected borrowed value")
         }
     }
 
@@ -58,9 +72,15 @@ mod tests {
         // case no mutation occurs and thus also no clone, but the result is
         // still owned because it was never borrowed or mutated.
         let slice = vec![0, 1, 2];
+        // TODO 传给from的是slice本身，而不是他的引用。前面几个test都是直接传的引用。所以，会以borrowed方式初始化
+        //      当以moved方式传递时，就直接是owned value
         let mut input = Cow::from(slice);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Owned(v) => {
+                assert_eq!(Vec::<i32>::from([0, 1, 2]), *v);
+                Ok(())
+            },
+            _ => Err("Expected owned value"),
         }
     }
 
@@ -72,7 +92,8 @@ mod tests {
         let slice = vec![-1, 0, 1];
         let mut input = Cow::from(slice);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Owned(v) => { assert_eq!(Vec::<i32>::from([1, 0, 1]), *v); Ok(())},
+            _ => Err("Expected owned value")
         }
     }
 }

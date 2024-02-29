@@ -10,7 +10,7 @@
 //
 // Execute `rustlings hint rc1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+
 
 use std::rc::Rc;
 
@@ -19,6 +19,7 @@ struct Sun {}
 
 #[derive(Debug)]
 enum Planet {
+    // 让行星“拥有”sun，来表示这个行星属于这个太阳系
     Mercury(Rc<Sun>),
     Venus(Rc<Sun>),
     Earth(Rc<Sun>),
@@ -61,22 +62,29 @@ fn main() {
     jupiter.details();
 
     // TODO
-    let saturn = Planet::Saturn(Rc::new(Sun {}));
+    let saturn = Planet::Saturn(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
     saturn.details();
 
-    // TODO
-    let uranus = Planet::Uranus(Rc::new(Sun {}));
+    // TODO sun.clone()与Rc::clone(&sun)的效果是一样的，他们最终调用的是同一个函数
+    //     调用一个对象的方法，可以用两种等价的方式。需要确认这两种是否是等价的
+    // 1.  obj.someFunc()
+    // 2.  ObjType::someFunc(&obj)
+    let uranus = Planet::Uranus(sun.clone());
     println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
     uranus.details();
+    // let some_str = "12345".to_owned();
+    // let upper_str = some_str.to_uppercase();
+    // let upper_str2 = str::to_uppercase(&upper_str);
 
     // TODO
-    let neptune = Planet::Neptune(Rc::new(Sun {}));
+    let neptune = Planet::Neptune(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 9 references
     neptune.details();
 
     assert_eq!(Rc::strong_count(&sun), 9);
 
+    // 显式释放一个对象
     drop(neptune);
     println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
 
@@ -93,12 +101,15 @@ fn main() {
     println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
 
     // TODO
+    drop(earth);
     println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
 
     // TODO
+    drop(venus);
     println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
 
     // TODO
+    drop(mercury);
     println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
 
     assert_eq!(Rc::strong_count(&sun), 1);

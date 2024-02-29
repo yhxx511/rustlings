@@ -27,7 +27,7 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
+
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -37,10 +37,41 @@ enum IntoColorError {
 // time, but the slice implementation needs to check the slice length! Also note
 // that correct RGB color values must be integers in the 0..=255 range.
 
+fn is_valid(c: i16) -> bool {
+    (0..=255).contains(&c)
+}
+
+fn is_valid_t<T>(c: T) -> bool
+    where T: Into<i32> + Copy {
+    let r = i32::try_from(c);
+    return if r.is_ok() {
+        (0..=255).contains(&(r.unwrap()))
+    } else {
+        false
+    }
+}
+
 // Tuple implementation
-impl TryFrom<(i16, i16, i16)> for Color {
+// impl TryFrom<(i16, i16, i16)> for Color {
+//     type Error = IntoColorError;
+//     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+//         return if is_valid(tuple.0) && is_valid(tuple.1) && is_valid(tuple.2) {
+//             Ok(Color {red: tuple.0 as u8, green: tuple.1 as u8, blue: tuple.2 as u8 })
+//         } else {
+//             Err(IntoColorError::IntConversion)
+//         }
+//     }
+// }
+
+// 这个实现太复杂了。。。。
+impl<T:Into<i32> + Copy> TryFrom<(T, T, T)> for Color {
     type Error = IntoColorError;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+    fn try_from(tuple: (T, T, T)) -> Result<Self, Self::Error> {
+        return if is_valid_t(tuple.0) && is_valid_t(tuple.1) && is_valid_t(tuple.2) {
+            Ok(Color {red: tuple.0.into() as u8, green: tuple.1.into() as u8, blue: tuple.2.into() as u8 })
+        } else {
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 
@@ -48,6 +79,11 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        return if is_valid(arr[0]) && is_valid(arr[1]) && is_valid(arr[2]) {
+            Ok(Color{ red: arr[0] as u8, green: arr[1] as u8, blue: arr[2] as u8})
+        } else {
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 
@@ -55,6 +91,15 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        // TODO 下面这段代码是copy自上面的try_from，貌似不太能共享代码
+        return if is_valid(slice[0]) && is_valid(slice[1]) && is_valid(slice[2]) {
+            Ok(Color{ red: slice[0] as u8, green: slice[1] as u8, blue: slice[2] as u8})
+        } else {
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 

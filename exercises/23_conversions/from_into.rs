@@ -40,10 +40,33 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
+
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.len() == 0 {
+            return Person::default();
+        }
+
+        let parts: Vec<&str> = s.split(",").collect();
+        println!("split result: {:?}", parts);
+        return if parts.len() < 2 {
+            Person::default()
+        } else {
+            // 检查name
+            let name_str = parts[0];
+            if name_str.len() == 0 {
+                return Person::default();
+            }
+
+            // 检查age
+            let age = parts[1].parse::<usize>();
+            if age.is_ok() {
+                Person { name: name_str.to_owned(), age: age.unwrap() }
+            } else {
+                Person::default()
+            }
+        }
     }
 }
 
@@ -124,6 +147,7 @@ mod tests {
         assert_eq!(p.age, 30);
     }
 
+    // 下面这两个case被设计为成功，是有争议的。正式的生产代码应该更严谨。
     #[test]
     fn test_trailing_comma() {
         let p: Person = Person::from("Mike,32,");

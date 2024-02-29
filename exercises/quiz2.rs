@@ -20,7 +20,7 @@
 //
 // No hints this time!
 
-// I AM NOT DONE
+
 
 pub enum Command {
     Uppercase,
@@ -31,12 +31,30 @@ pub enum Command {
 mod my_module {
     use super::Command;
 
-    // TODO: Complete the function signature!
-    pub fn transformer(input: ???) -> ??? {
-        // TODO: Complete the output declaration!
-        let mut output: ??? = vec![];
+    pub fn transformer(input: Vec<(String, Command)>) -> Vec<String> {
+        let mut output: Vec<String> = Vec::new();
         for (string, command) in input.iter() {
-            // TODO: Complete the function body. You can do it!
+            match command {
+                Command::Uppercase =>  { output.push(string.to_uppercase()) }
+                Command::Trim =>  { output.push(string.trim().to_owned()) }
+                Command::Append(times) =>  {
+                    // 注意，这里的*times，因为iter()返回只读引用，这里需要显式解引用？？？
+                    // let postfix: String = "bar".to_string().repeat(*times);
+                    // // postfix需要用只读引用，因为concat是
+                    // let mut result = string.clone();
+                    // result.push_str(&postfix);
+                    // output.push(result);
+
+                    // 上面的实现有好多次string拷贝，我们需要一种只分配一次内存的方式
+                    let expected_len = string.len() + "bar".len() * *times;
+                    let mut result = String::with_capacity(expected_len);
+                    result.push_str(string);
+                    for i in 0 .. *times {
+                        result.push_str("bar")
+                    }
+                    output.push(result);
+                }
+            }
         }
         output
     }
@@ -45,7 +63,7 @@ mod my_module {
 #[cfg(test)]
 mod tests {
     // TODO: What do we need to import to have `transformer` in scope?
-    use ???;
+    use super::my_module::transformer;
     use super::Command;
 
     #[test]

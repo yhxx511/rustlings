@@ -5,13 +5,23 @@
 //
 // Execute `rustlings hint if2` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
-pub fn foo_if_fizz(fizzish: &str) -> &str {
-    if fizzish == "fizz" {
+
+pub fn convert(txt: &str) -> &str {
+    match txt {
+        "fizz" => "foo",
+        "fuzz" => "bar",
+        _ => "baz"
+    }
+}
+
+pub fn convert_with_if(txt: &str) -> &str {
+    if txt == "fizz" {
         "foo"
+    } else if txt == "fuzz" {
+        "bar"
     } else {
-        1
+        "baz"
     }
 }
 
@@ -22,16 +32,31 @@ mod tests {
 
     #[test]
     fn foo_for_fizz() {
-        assert_eq!(foo_if_fizz("fizz"), "foo")
+        assert_eq!(convert("fizz"), "foo")
+    }
+
+    #[test]
+    fn foo_for_fizz2() {
+        assert_eq!(convert_with_if("fizz"), "foo")
     }
 
     #[test]
     fn bar_for_fuzz() {
-        assert_eq!(foo_if_fizz("fuzz"), "bar")
+        assert_eq!(convert("fuzz"), "bar")
+    }
+
+    #[test]
+    fn bar_for_fuzz2() {
+        assert_eq!(convert_with_if("fuzz"), "bar")
     }
 
     #[test]
     fn default_to_baz() {
-        assert_eq!(foo_if_fizz("literally anything"), "baz")
+        assert_eq!(convert("literally anything"), "baz")
+    }
+
+    #[test]
+    fn default_to_baz2() {
+        assert_eq!(convert_with_if("literally anything"), "baz")
     }
 }
